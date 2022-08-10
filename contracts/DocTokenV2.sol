@@ -1,13 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155SupplyUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract DocTokenV2 is ERC1155, Ownable, ERC1155Supply {
+contract DocToken is Initializable, ERC1155Upgradeable, OwnableUpgradeable, ERC1155SupplyUpgradeable {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
 
-    constructor() ERC1155("https://gateway.pinata.cloud/ipfs/QmT4TUE6zQs1Cn6c4gtzDLb6dYesXS5SswZTh4hborm8AE/{id}.json") {}
+    function initialize() initializer public {
+        __ERC1155_init("");
+        __Ownable_init();
+        __ERC1155Supply_init();
+    }
 
     function setURI(string memory newuri) public onlyOwner {
         _setURI(newuri);
@@ -28,11 +37,11 @@ contract DocTokenV2 is ERC1155, Ownable, ERC1155Supply {
     }
 
     // The following functions are overrides required by Solidity.
+
     function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
         internal
-        override(ERC1155, ERC1155Supply)
+        override(ERC1155Upgradeable, ERC1155SupplyUpgradeable)
     {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
-    
 }
